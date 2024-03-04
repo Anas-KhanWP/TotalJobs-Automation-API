@@ -18,7 +18,7 @@ This repository provides a FastAPI-based API for automating various actions on t
 1. Clone this repository:
 
    ```bash
-   git clone https://github.com/AffanAhmedUsmani/totaljobs-bot.git
+   git clone https://github.com/Anas-KhanWP/TotalJobs-Automation-API.git
    ```
 
 2. Navigate to the project directory:
