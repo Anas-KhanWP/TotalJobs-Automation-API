@@ -16,10 +16,25 @@ logging.basicConfig(
 
 
 class TotalJobsScraper:
+    """
+    A class for scraping job postings from the website TotalJobs.com.
+
+    Args:
+        driver (webdriver): A Selenium WebDriver instance for interacting with the website.
+
+    Attributes:
+        driver (webdriver): A Selenium WebDriver instance for interacting with the website.
+
+    """
+
     def __init__(self, driver):
         self.driver = driver
 
     def accept_cookie(self):
+        """
+        Accepts any cookies that may be displayed by the website.
+
+        """
         try:
             accept_button = WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located((By.XPATH, "//div[text()='Accept All']"))
@@ -32,12 +47,28 @@ class TotalJobsScraper:
         except:
             logging.info("No Cookie popup")
 
-
     def getRandomSleep(self):
+        """
+        Returns a random number of seconds to sleep for, between 1 and 10.
+
+        Returns:
+            float: A random number of seconds to sleep for.
+
+        """
         random_sleep_duration = random.uniform(1, 10)
         return random_sleep_duration
 
     def get_job_link(self, job):
+        """
+        Extracts the job link from the given job element.
+
+        Args:
+            job (WebElement): A job element from the website.
+
+        Returns:
+            str: The job link, or None if the job link could not be found.
+
+        """
         try:
             job_a = job.find_element(By.XPATH, ".//a[@class='res-1taea5l']")
             job_link = job_a.get_attribute("href")
@@ -48,6 +79,13 @@ class TotalJobsScraper:
             logging.exception("Element not found")
 
     def getTotalJobs(self):
+        """
+        Extracts the total number of jobs from the website.
+
+        Returns:
+            int: The total number of jobs, or None if the total number of jobs could not be found.
+
+        """
         try:
             # Find the <span> element with data-at attribute set to "search-jobs-count" using XPath
             xpath_expression = "//span[@data-at='search-jobs-count']"
@@ -63,6 +101,13 @@ class TotalJobsScraper:
             logging.info("Element not found")
 
     def getJobsList(self):
+        """
+        Returns a list of job elements from the website.
+
+        Returns:
+            list: A list of job elements, or None if no job elements could be found.
+
+        """
         try:
             job_divs = WebDriverWait(self.driver, 30).until(
                 EC.presence_of_all_elements_located((By.TAG_NAME, "article"))
@@ -78,6 +123,17 @@ class TotalJobsScraper:
             return None
 
     def get_jobs(self, title, location):
+        """
+        Scrapes job postings from the website TotalJobs.com.
+
+        Args:
+            title (str): The job title to search for.
+            location (str): The location to search for jobs in.
+
+        Returns:
+            list: A list of job links, or an empty list if no jobs were found.
+
+        """
         job_links = []
 
         start_url = f"https://www.totaljobs.com/jobs/{title}/in-{location}?radius=10&page=1"

@@ -38,6 +38,18 @@ api_key_scheme = APIKeyHeader(name="X-API-KEY", auto_error=False)
 
 # Custom function to validate the API key
 def get_api_key(api_key: str = Depends(api_key_scheme)):
+    """
+    Validate the API key.
+
+    Args:
+        api_key (str): The API key sent by the client.
+
+    Returns:
+        str: The validated API key.
+
+    Raises:
+        HTTPException: If the API key is invalid.
+    """
     if api_key == API_KEY:
         return api_key
     else:
@@ -48,7 +60,13 @@ def get_api_key(api_key: str = Depends(api_key_scheme)):
         )
 
 
-def run_chrome():
+def run_chrome() -> WebDriver:
+    """
+    This function creates a new instance of Chrome WebDriver with the desired options.
+
+    Returns:
+        WebDriver: A new instance of Chrome WebDriver with the desired options.
+    """
     options = webdriver.ChromeOptions()
     # Set the user agent to mimic a real browser
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36"
@@ -97,6 +115,23 @@ async def signup(
     resume: UploadFile = File(default=None),
     job_title: str = Form(...),
 ):
+    """
+    Signup endpoint.
+
+    Args:
+        api_key (str): The API key used to authenticate the request.
+        first_name (str): The first name of the user.
+        last_name (str): The last name of the user.
+        client_email (str): The email address of the user.
+        resume (UploadFile): The resume of the user.
+        job_title (str): The job title of the user.
+
+    Returns:
+        A JSON object containing the email and password of the newly created user.
+
+    Raises:
+        HTTPException: If the API key is invalid, or if the email is not generated from the API.
+    """
     try:
         driver = run_chrome()
         # Create an instance of ResumeUploader
@@ -155,7 +190,23 @@ async def signup(
 
 
 @app.post("/login", dependencies=[Depends(get_api_key)])
-async def login(email: str = Form(...), password: str = Form(...)):
+async def login(
+    email: str,  # The email address of the user
+    password: str,  # The password of the user
+):
+    """
+    Login endpoint.
+
+    Args:
+        email (str): The email address of the user.
+        password (str): The password of the user.
+
+    Returns:
+        A JSON object containing a message indicating whether the login was successful.
+
+    Raises:
+        HTTPException: If the login is unsuccessful.
+    """
     try:
         driver = run_chrome()
         total_jobs_login = TotalJobsLogin(driver, email, password)
@@ -168,10 +219,24 @@ async def login(email: str = Form(...), password: str = Form(...)):
 
 @app.post("/replace_resume", dependencies=[Depends(get_api_key)])
 async def replace_resume(
-    email: str = Form(...),
-    password: str = Form(...),
-    resume: UploadFile = File(...),
+    email: str,  # The email address of the user
+    password: str,  # The password of the user
+    resume: UploadFile,  # The resume file to be uploaded
 ):
+    """
+    Replace the resume of a user.
+
+    Args:
+        email (str): The email address of the user.
+        password (str): The password of the user.
+        resume (UploadFile): The resume file to be uploaded.
+
+    Returns:
+        A JSON object containing a message indicating whether the resume was uploaded successfully.
+
+    Raises:
+        HTTPException: If the resume upload fails.
+    """
     try:
         driver = run_chrome()
         resume_uploader = ResumeUploader(driver)
@@ -188,6 +253,20 @@ async def scrape_jobs(
     job_title: str = Query(..., description="Title of the job"),
     location: str = Query(..., description="Location of the job"),
 ):
+    """
+    This function uses the TotalJobsScraper class to scrape job postings from the TotalJobs website.
+
+    Args:
+        user_id (str): The TotalJobs user ID.
+        job_title (str): The job title.
+        location (str): The location.
+
+    Returns:
+        A JSON object containing a list of job links.
+
+    Raises:
+        HTTPException: If an error occurs.
+    """
     try:
         driver = run_chrome()
         total_jobs_scraper = TotalJobsScraper(driver)
@@ -200,10 +279,24 @@ async def scrape_jobs(
 
 @app.post("/login_apply", dependencies=[Depends(get_api_key)])
 async def login_scrape_apply(
-    email: str = Form(...),
-    password: str = Form(...),
-    job_links: List[str] = Form(...),
+    email: str,  # The email address of the user
+    password: str,  # The password of the user
+    job_links: List[str],  # A list of job links
 ):
+    """
+    This function logs in to TotalJobs, scrapes job postings, and applies to the jobs.
+
+    Args:
+        email (str): The email address of the user.
+        password (str): The password of the user.
+        job_links (List[str]): A list of job links.
+
+    Returns:
+        A JSON object containing a message indicating the status of the login, scrape, and apply process.
+
+    Raises:
+        HTTPException: If an error occurs.
+    """
     try:
         driver = run_chrome()
         total_jobs_login = TotalJobsLogin(driver, email, password)
@@ -212,12 +305,12 @@ async def login_scrape_apply(
         job_actions = JobActions(driver)
         for job_link in job_links:
             logging.info(f"Current Job URL => {job_link}")
-            responseMsg = job_actions.apply_to_job(job_link)
+            response_msg = job_actions.apply_to_job(job_link)
 
         driver.quit()
-        if responseMsg == 200:
+        if response_msg == 200:
             return {"message": "Login and apply successful"}
-        elif responseMsg == 201:
+        elif response_msg == 201:
             return {"message": "External Job Skipping"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -230,6 +323,21 @@ async def login_scrape_apply(
     job_title: str = Form(...),  # job title
     location: str = Form(...),  # location
 ):
+    """
+    This function logs in to TotalJobs, scrapes job postings, and applies to the jobs.
+
+    Args:
+        email (str): The email address of the user.
+        password (str): The password of the user.
+        job_title (str): The job title to search for.
+        location (str): The location to search for jobs.
+
+    Returns:
+        A JSON object containing a message indicating the status of the login, scrape, and apply process.
+
+    Raises:
+        HTTPException: If an error occurs.
+    """
     try:
         driver = run_chrome()
         total_jobs_login = TotalJobsLogin(driver, email, password)
@@ -241,12 +349,12 @@ async def login_scrape_apply(
         job_actions = JobActions(driver)
         for job_link in job_links:
             logging.info(f"Current Job URL => {job_link}")
-            responseMsg = job_actions.apply_to_job(job_link)
+            response_msg = job_actions.apply_to_job(job_link)
 
         driver.quit()
-        if responseMsg == 200:
-            return {"message": "Login, scrape, and apply successful"}
-        elif responseMsg == 201:
+        if response_msg == 200:
+            return {"message": "Login and apply successful"}
+        elif response_msg == 201:
             return {"message": "External Job Skipping"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -254,5 +362,4 @@ async def login_scrape_apply(
 
 if __name__ == "__main__":
     import uvicorn
-
     uvicorn.run(app, host="127.0.0.1", port=8000)

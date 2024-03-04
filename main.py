@@ -8,16 +8,26 @@ from apply import JobActions
 from login import TotalJobsLogin
 from uploadresume import ResumeUploader
 import logging
+import requests
 
 logging.basicConfig(
     filename="app.log",
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
-import requests
 
 
 def run_chrome():
+    """
+    This function initializes a new instance of the Chrome WebDriver with the specified options.
+
+    Args:
+        options (ChromeOptions): A ChromeOptions object that specifies the desired options for the Chrome WebDriver.
+
+    Returns:
+        WebDriver: A new instance of the Chrome WebDriver.
+
+    """
     options = webdriver.ChromeOptions()
 
     # Set the user agent to mimic a real browser

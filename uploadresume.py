@@ -14,10 +14,31 @@ logging.basicConfig(
 
 
 class ResumeUploader:
+    """
+    This class is used to upload a resume to the TotalJobs website.
+
+    Args:
+        driver (webdriver): The WebDriver instance used to interact with the website.
+
+    Attributes:
+        driver (webdriver): The WebDriver instance used to interact with the website.
+
+    """
+
     def __init__(self, driver):
         self.driver = driver
 
     def uploadToServer(self, resume):
+        """
+        This function is used to store the uploaded file in the "resumes" directory.
+
+        Args:
+            resume (werkzeug.datastructures.FileStorage): The uploaded resume file.
+
+        Returns:
+            str: The path of the stored resume file.
+
+        """
         # Store the uploaded file in the "/resumes" directory
         resume_directory = "resumes"
         os.makedirs(resume_directory, exist_ok=True)
@@ -28,6 +49,16 @@ class ResumeUploader:
             return resume_filename
 
     def upload_resume(self, resume_name):
+        """
+        This function is used to upload the resume to the TotalJobs website.
+
+        Args:
+            resume_name (str): The name of the resume file.
+
+        Raises:
+            Exception: If an error occurs while uploading the resume.
+
+        """
         try:
             # Find and click the button to open the container
             btn_cv_upload = self.driver.find_element(By.ID, "btnCVUpload")
@@ -55,6 +86,19 @@ class ResumeUploader:
             logging.exception(f"Error while uploading resume => {e}")
 
     def replaceResume(self, driver, email, password, resume):
+        """
+        This function is used to replace the resume on the TotalJobs website.
+
+        Args:
+            driver (webdriver): The WebDriver instance used to interact with the website.
+            email (str): The email address used to login to TotalJobs.
+            password (str): The password used to login to TotalJobs.
+            resume (werkzeug.datastructures.FileStorage): The uploaded resume file.
+
+        Raises:
+            Exception: If an error occurs while replacing the resume.
+
+        """
         try:
             self.driver.get("https://www.totaljobs.com/profile")
 
@@ -76,7 +120,7 @@ class ResumeUploader:
             ).send_keys(resume_name_absolute)
 
             time.sleep(5)
-            logging.info(f"Resume Updated Successfully, Resume path: %s" % resume_name_absolute)
+            logging.info(f"Resume Updated Successfully, Resume path: {resume_name_absolute}")
         except Exception as e:
             logging.exception(f"Error while uploading resume => {e}")
 

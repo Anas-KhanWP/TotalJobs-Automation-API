@@ -17,7 +17,23 @@ signUpUrl = "https://www.totaljobs.com/Account/Register?ReturnUrl=%2Fprofile"
 
 
 class SignupBot:
+    """
+    This class is used to automate the Totaljobs.com sign up process.
+    """
+
     def __init__(self, driver, fname, lname, email, password, resumepath, job_title):
+        """
+        Initialize the SignupBot class.
+
+        Args:
+            driver (WebDriver): The WebDriver instance used to interact with the website.
+            fname (str): The first name of the user.
+            lname (str): The last name of the user.
+            email (str): The email address of the user.
+            password (str): The password of the user.
+            resumepath (str): The path to the user's resume file.
+            job_title (str): The job title of the user.
+        """
         self.resumepath = resumepath
         self.email = email
         self.password = password
@@ -28,6 +44,9 @@ class SignupBot:
         # self.salary = salary
 
     def accept_cookie(self):
+        """
+        Accept the website's cookie policy.
+        """
         try:
             accept_button = WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located((By.XPATH, "//div[text()='Accept All']"))
@@ -41,6 +60,9 @@ class SignupBot:
             logging.info("No Cookie popup")
 
     def submitSignUp(self):
+        """
+        Submit the user's sign up form.
+        """
         try:
             _submit_button = WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located((By.XPATH, "//button[text()='Submit']"))
@@ -52,6 +74,9 @@ class SignupBot:
             logging.info("No Submit button Found")
 
     def input_first_name(self):
+        """
+        Input the user's first name.
+        """
         try:
             first_name = WebDriverWait(self.driver, 30).until(
                 EC.presence_of_element_located((By.XPATH, '//input[@id="firstname"]'))
@@ -64,6 +89,9 @@ class SignupBot:
             logging.error(f"Error while inputting first name => {e}")
 
     def input_last_name(self):
+        """
+        Input the user's last name.
+        """
         try:
             last_name = WebDriverWait(self.driver, 30).until(
                 EC.presence_of_element_located((By.XPATH, '//input[@id="surname"]'))
@@ -76,6 +104,9 @@ class SignupBot:
             logging.exception(f"Error while inputting last name => {e}")
 
     def input_email(self):
+        """
+        Input the user's email address.
+        """
         try:
             _email = WebDriverWait(self.driver, 30).until(
                 EC.presence_of_element_located((By.XPATH, '//input[@id="email"]'))
@@ -88,6 +119,9 @@ class SignupBot:
             logging.error(f"Error while inputting email address => {e}")
 
     def input_job_title(self):
+        """
+        Input the user's job title.
+        """
         try:
             _job_title = WebDriverWait(self.driver, 30).until(
                 EC.presence_of_element_located(
@@ -103,6 +137,9 @@ class SignupBot:
             logging.error(f"Error while inputting job title => {e}")
 
     def currentSalary(self):
+        """
+        Select the user's current salary.
+        """
         try:
             _salary_expectations = WebDriverWait(self.driver, 30).until(
                 EC.presence_of_element_located(
@@ -122,6 +159,9 @@ class SignupBot:
             )
 
     def input_pass(self):
+        """
+        Input the user's password.
+        """
         try:
             _pass = WebDriverWait(self.driver, 30).until(
                 EC.presence_of_element_located((By.XPATH, '//input[@id="password"]'))
@@ -133,6 +173,9 @@ class SignupBot:
             logging.exception(f"Error occurred while inputting password => {e}")
 
     def input_pass_again(self):
+        """
+        Confirm the user's password.
+        """
         try:
             _pass_again = WebDriverWait(self.driver, 30).until(
                 EC.presence_of_element_located(
@@ -146,6 +189,9 @@ class SignupBot:
             logging.exception(f"Error occurred while confirming password => {e}")
 
     def make_totalBot_signup(self):
+        """
+        Submit the user's sign up form and return the email and password.
+        """
         try:
             self.driver.get(signUpUrl)
             time.sleep(5)
