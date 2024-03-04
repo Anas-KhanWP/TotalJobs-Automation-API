@@ -1,0 +1,8 @@
+/env
+/test.py
+/node_modules
+/package-lock.json
+/package.json
+/resumes
+.idea
+__pycache__
